@@ -1,12 +1,24 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 
 const port = process.env.PORT || 3000;
 
-// ✅ Brand-specific image URLs (extendable)
+// ✅ Serve frontend dashboard (if built with Vite or React)
+app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+
+// Optional: fallback to index.html for SPA routing
+app.get(/^\/(?!api\/).*/, (req, res, next) => {
+  const indexPath = path.join(__dirname, 'frontend', 'dist', 'index.html');
+  res.sendFile(indexPath, (err) => {
+    if (err) next(); // fallback to Express if file not found
+  });
+});
+
+// ✅ Brand-specific image URLs
 const images = {
   wttt: [
     "https://raw.githubusercontent.com/WELCOMETOTHETRIBE/wttt-assets/main/bg-library/tribal1.jpg",
@@ -20,7 +32,7 @@ const images = {
   ]
 };
 
-// ✅ Brand-specific quotes (extendable)
+// ✅ Brand-specific quotes
 const quotes = {
   wttt: [
     "Heal yourself, heal the tribe.",
@@ -36,55 +48,14 @@ const quotes = {
   ]
 };
 
-// ✅ HTML Dashboard
-app.get('/', (req, res) => {
-  res.send(`
-    <html>
-    <head>
-      <title>TRIBECORE Asset Dashboard</title>
-      <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0d0d0d; color: #f0f0f0; text-align: center; padding: 40px; }
-        h1 { font-size: 2.5em; margin-bottom: 10px; }
-        p { color: #aaa; }
-        .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 30px; }
-        a.button {
-          display: inline-block;
-          padding: 15px 25px;
-          background: #1e1e1e;
-          color: #fff;
-          text-decoration: none;
-          border: 2px solid #444;
-          border-radius: 8px;
-          transition: 0.2s;
-        }
-        a.button:hover {
-          background: #28a745;
-          border-color: #28a745;
-        }
-      </style>
-    </head>
-    <body>
-      <h1>🔥 TRIBECORE Asset API Dashboard</h1>
-      <p>Generate marketing payloads for WTTT, Jabroni’s, and Denly Gardens</p>
-      <div class="grid">
-        <a class="button" href="/notion-payload?brand=wttt">🎯 WTTT Payload</a>
-        <a class="button" href="/notion-payload?brand=jabroni">🔥 Jabroni Payload</a>
-        <a class="button" href="/notion-payload?brand=denly">🍕 Denly Payload</a>
-        <a class="button" href="/quote?brand=wttt">🧠 WTTT Quote Only</a>
-        <a class="button" href="/random?brand=wttt">🖼 WTTT Image Only</a>
-        <a class="button" href="/quote?brand=jabroni">💬 Jabroni Quote</a>
-        <a class="button" href="/random?brand=denly">📸 Denly Image</a>
-      </div>
-      <p style="margin-top: 40px; font-size: 0.9em; color: #666;">
-        TRIBECORE v1.0 — Modular API for Creative Automation <br>
-        Ready for Zapier, Notion, Canva & Content Ops integrations
-      </p>
-    </body>
-    </html>
-  `);
-});
+// 🔁 Mood by brand
+const moods = {
+  wttt: "🌀 Ancestral",
+  jabroni: "🔥 Bold",
+  denly: "🍕 Nostalgic"
+};
 
-// 🎯 API to get a random image for a brand
+// 🎯 Get random image
 app.get('/random', (req, res) => {
   const brand = req.query.brand || 'wttt';
   const selected = images[brand] || images['wttt'];
@@ -92,7 +63,7 @@ app.get('/random', (req, res) => {
   res.json({ brand, image });
 });
 
-// 💬 API to get a random quote
+// 💬 Get random quote
 app.get('/quote', (req, res) => {
   const brand = req.query.brand || 'wttt';
   const selected = quotes[brand] || quotes['wttt'];
@@ -100,7 +71,7 @@ app.get('/quote', (req, res) => {
   res.json({ brand, quote });
 });
 
-// 🔁 API to get full payload (image + quote)
+// 🧠 Notion/Zapier-friendly payload
 app.get('/notion-payload', (req, res) => {
   const brand = req.query.brand || 'wttt';
   const selectedImages = images[brand] || images['wttt'];
@@ -109,17 +80,21 @@ app.get('/notion-payload', (req, res) => {
   const image = selectedImages[Math.floor(Math.random() * selectedImages.length)];
   const quote = selectedQuotes[Math.floor(Math.random() * selectedQuotes.length)];
 
-  // 🎁 Return useful object for Zapier, Notion, or dashboard usage
   res.json({
     title: `Daily Creative — ${brand.toUpperCase()}`,
     brand,
     image,
     quote,
-    mood: brand === 'wttt' ? "🌀 Ancestral" : brand === 'jabroni' ? "🔥 Bold" : "🍕 Nostalgic"
+    mood: moods[brand] || "✨ Creative"
   });
 });
 
-// 🚀 App listener
+// ✨ Health check fallback (for dev testing)
+app.get('/health', (req, res) => {
+  res.send("✅ TRIBECORE server is up and running!");
+});
+
+// 🚀 Start the server
 app.listen(port, '0.0.0.0', () => {
   console.log(`TRIBECORE server running on port ${port}`);
 });
