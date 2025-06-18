@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import BrandWidgets from './BrandWidgets';
 
 const brands = [
   {
@@ -6,25 +9,25 @@ const brands = [
     id: 'wttt',
     emoji: '🌿',
     api: '/notion-payload?brand=wttt',
-    color: 'linear-gradient(to right, #10b981, #14b8a6)'
+    color: 'from-green-500 to-teal-400'
   },
   {
     name: "Jabroni's",
     id: 'jabroni',
     emoji: '🔥',
     api: '/notion-payload?brand=jabroni',
-    color: 'linear-gradient(to right, #dc2626, #f59e0b)'
+    color: 'from-red-600 to-yellow-500'
   },
   {
     name: 'Denly Gardens',
     id: 'denly',
     emoji: '🍕',
     api: '/notion-payload?brand=denly',
-    color: 'linear-gradient(to right, #f59e0b, #f97316)'
+    color: 'from-yellow-500 to-orange-400'
   }
 ];
 
-function App() {
+export default function Dashboard() {
   const [payloads, setPayloads] = useState({});
   const [loading, setLoading] = useState(null);
 
@@ -46,61 +49,38 @@ function App() {
   }, []);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f0f0f', color: '#fff', padding: '2rem' }}>
-      <h1 style={{ textAlign: 'center', fontSize: '2rem', marginBottom: '2rem' }}>
-        TRIBECORE Content Dashboard
-      </h1>
-      <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+    <div className="min-h-screen bg-gradient-to-br from-black to-zinc-900 text-white p-6">
+      <h1 className="text-3xl font-bold mb-8 text-center">TRIBECORE Content Dashboard</h1>
+      <div className="grid md:grid-cols-3 gap-6">
         {brands.map((brand) => (
-          <div
-            key={brand.id}
-            style={{
-              background: '#1f1f1f',
-              borderRadius: '16px',
-              boxShadow: '0 0 20px rgba(0,0,0,0.4)',
-              padding: '1.5rem',
-              width: '300px'
-            }}
-          >
-            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>
-              {brand.emoji} {brand.name}
-            </h2>
-            {payloads[brand.id] ? (
-              <>
-                <img
-                  src={payloads[brand.id].image}
-                  alt="asset"
-                  style={{ width: '100%', borderRadius: '12px', marginBottom: '1rem' }}
-                />
-                <p style={{ fontStyle: 'italic', marginBottom: '1rem' }}>
-                  "{payloads[brand.id].quote}"
-                </p>
-              </>
-            ) : (
-              <p style={{ color: '#aaa' }}>Loading...</p>
-            )}
-            <button
-              onClick={() => fetchPayload(brand.id)}
-              disabled={loading === brand.id}
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                background: brand.color,
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}
-            >
-              {loading === brand.id ? 'Refreshing...' : 'Refresh Content'}
-            </button>
-          </div>
+          <Card key={brand.id} className="rounded-2xl shadow-xl">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold mb-2">{brand.emoji} {brand.name}</h2>
+              {payloads[brand.id] ? (
+                <>
+                  <img
+                    src={payloads[brand.id].image}
+                    alt="asset"
+                    className="rounded-lg mb-3"
+                  />
+                  <p className="italic mb-3">"{payloads[brand.id].quote}"</p>
+                  <BrandWidgets brand={brand.id} />
+                </>
+              ) : (
+                <p className="text-zinc-400">Loading...</p>
+              )}
+              <Button
+                onClick={() => fetchPayload(brand.id)}
+                disabled={loading === brand.id}
+                className={`w-full bg-gradient-to-r ${brand.color} hover:brightness-110 mt-4`}
+              >
+                {loading === brand.id ? 'Refreshing...' : 'Refresh Content'}
+              </Button>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>
   );
 }
-
-export default App;
 
