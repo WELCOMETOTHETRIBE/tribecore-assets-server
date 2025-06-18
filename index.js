@@ -8,7 +8,7 @@ app.use(cors());
 const port = process.env.PORT || 3000;
 
 // ✅ Serve frontend static files (Vite or CRA build output)
-app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+app.use(express.static(path.join(__dirname, 'frontend', 'build')));
 
 // ✅ API: Brand-specific image URLs
 const images = {
@@ -88,7 +88,7 @@ app.get('/health', (req, res) => {
 
 // 🪄 Fallback: Serve index.html for any route not handled above (for React Router)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
 });
 
 // 🚀 Start server
