@@ -7,18 +7,10 @@ app.use(cors());
 
 const port = process.env.PORT || 3000;
 
-// ✅ Serve frontend dashboard (if built with Vite or React)
+// ✅ Serve frontend static files (Vite or CRA build output)
 app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
 
-// Optional: fallback to index.html for SPA routing
-app.get(/^\/(?!api\/).*/, (req, res, next) => {
-  const indexPath = path.join(__dirname, 'frontend', 'dist', 'index.html');
-  res.sendFile(indexPath, (err) => {
-    if (err) next(); // fallback to Express if file not found
-  });
-});
-
-// ✅ Brand-specific image URLs
+// ✅ API: Brand-specific image URLs
 const images = {
   wttt: [
     "https://raw.githubusercontent.com/WELCOMETOTHETRIBE/wttt-assets/main/bg-library/tribal1.jpg",
@@ -32,7 +24,7 @@ const images = {
   ]
 };
 
-// ✅ Brand-specific quotes
+// ✅ API: Brand-specific quotes
 const quotes = {
   wttt: [
     "Heal yourself, heal the tribe.",
@@ -48,14 +40,14 @@ const quotes = {
   ]
 };
 
-// 🔁 Mood by brand
+// 🧠 Mood mapping
 const moods = {
   wttt: "🌀 Ancestral",
   jabroni: "🔥 Bold",
   denly: "🍕 Nostalgic"
 };
 
-// 🎯 Get random image
+// 🎯 API: Get random image
 app.get('/random', (req, res) => {
   const brand = req.query.brand || 'wttt';
   const selected = images[brand] || images['wttt'];
@@ -63,7 +55,7 @@ app.get('/random', (req, res) => {
   res.json({ brand, image });
 });
 
-// 💬 Get random quote
+// 💬 API: Get random quote
 app.get('/quote', (req, res) => {
   const brand = req.query.brand || 'wttt';
   const selected = quotes[brand] || quotes['wttt'];
@@ -71,7 +63,7 @@ app.get('/quote', (req, res) => {
   res.json({ brand, quote });
 });
 
-// 🧠 Notion/Zapier-friendly payload
+// 📦 API: Combined payload for Zapier / Notion / Dashboards
 app.get('/notion-payload', (req, res) => {
   const brand = req.query.brand || 'wttt';
   const selectedImages = images[brand] || images['wttt'];
@@ -89,12 +81,17 @@ app.get('/notion-payload', (req, res) => {
   });
 });
 
-// ✨ Health check fallback (for dev testing)
+// ✅ Health check
 app.get('/health', (req, res) => {
   res.send("✅ TRIBECORE server is up and running!");
 });
 
-// 🚀 Start the server
+// 🪄 Fallback: Serve index.html for any route not handled above (for React Router)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+});
+
+// 🚀 Start server
 app.listen(port, '0.0.0.0', () => {
   console.log(`TRIBECORE server running on port ${port}`);
 });
