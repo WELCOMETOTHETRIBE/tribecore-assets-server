@@ -34,37 +34,31 @@ const quotes = {
   ]
 };
 
-const moods = {
-  wttt: "🌀 Ancestral",
-  jabroni: "🔥 Intense",
-  denly: "🍕 Classic"
-};
+app.get('/random', (req, res) => {
+  const brand = req.query.brand || 'wttt';
+  const selected = images[brand] || images['wttt'];
+  const image = selected[Math.floor(Math.random() * selected.length)];
+  res.json({ image });
+});
 
-// ✅ /notion-payload — for Notion integration
+app.get('/quote', (req, res) => {
+  const brand = req.query.brand || 'wttt';
+  const selected = quotes[brand] || quotes['wttt'];
+  const quote = selected[Math.floor(Math.random() * selected.length)];
+  res.json({ quote });
+});
+
 app.get('/notion-payload', (req, res) => {
   const brand = req.query.brand || 'wttt';
   const selectedImages = images[brand] || images['wttt'];
   const selectedQuotes = quotes[brand] || quotes['wttt'];
-  const selectedMood = moods[brand] || "🌀 Vibe";
-
   const image = selectedImages[Math.floor(Math.random() * selectedImages.length)];
   const quote = selectedQuotes[Math.floor(Math.random() * selectedQuotes.length)];
-  const mood = selectedMood;
 
-  res.json({
-    title: `Daily Creative — ${brand.toUpperCase()}`,
-    image,
-    quote,
-    mood
-  });
+  res.json({ brand, image, quote });
 });
 
-// Optional: homepage fallback
-app.get('/', (req, res) => {
-  res.send('🚀 TRIBECORE ASSETS API is live.');
-});
-
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`TRIBECORE server running on ${port}`);
 });
 
