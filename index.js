@@ -34,6 +34,11 @@ const quotes = {
   ]
 };
 
+// ✅ NEW: Root route for health check
+app.get("/", (req, res) => {
+  res.send("✅ TRIBECORE server is up and running!");
+});
+
 app.get('/random', (req, res) => {
   const brand = req.query.brand || 'wttt';
   const selected = images[brand] || images['wttt'];
