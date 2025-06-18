@@ -46,9 +46,23 @@ const brandMap = {
   denly: "Denly Gardens"
 };
 
+// Root endpoint with usage instructions
+app.get('/', (req, res) => {
+  res.send(`
+    <h1>👋 Welcome to the TRIBECORE Assets Server</h1>
+    <p>Try one of the following endpoints:</p>
+    <ul>
+      <li><a href="/random?brand=wttt">/random?brand=wttt</a></li>
+      <li><a href="/quote?brand=jabroni">/quote?brand=jabroni</a></li>
+      <li><a href="/background?brand=denly">/background?brand=denly</a></li>
+      <li><a href="/notion-payload?brand=wttt">/notion-payload?brand=wttt</a></li>
+    </ul>
+  `);
+});
+
 // Serve a random image
 app.get('/random', (req, res) => {
-  const brand = req.query.brand || 'wttt';
+  const brand = req.query.brand?.toLowerCase() || 'wttt';
   const selected = images[brand] || images['wttt'];
   const image = selected[Math.floor(Math.random() * selected.length)];
   res.json({ image });
@@ -56,15 +70,15 @@ app.get('/random', (req, res) => {
 
 // Serve a random quote
 app.get('/quote', (req, res) => {
-  const brand = req.query.brand || 'wttt';
+  const brand = req.query.brand?.toLowerCase() || 'wttt';
   const selected = quotes[brand] || quotes['wttt'];
   const quote = selected[Math.floor(Math.random() * selected.length)];
   res.json({ quote });
 });
 
-// Serve a creative pack (image + quote)
+// Serve a background bundle (image + quote)
 app.get('/background', (req, res) => {
-  const brand = req.query.brand || 'wttt';
+  const brand = req.query.brand?.toLowerCase() || 'wttt';
   const selectedImages = images[brand] || images['wttt'];
   const selectedQuotes = quotes[brand] || quotes['wttt'];
 
@@ -74,9 +88,9 @@ app.get('/background', (req, res) => {
   res.json({ brand, image, quote });
 });
 
-// Serve a full Notion-ready daily creative bundle
+// Serve a full Notion-ready creative content bundle
 app.get('/notion-payload', (req, res) => {
-  const brand = req.query.brand || 'wttt';
+  const brand = req.query.brand?.toLowerCase() || 'wttt';
 
   const selectedImages = images[brand] || images['wttt'];
   const selectedQuotes = quotes[brand] || quotes['wttt'];
@@ -94,7 +108,8 @@ app.get('/notion-payload', (req, res) => {
   });
 });
 
+// Start the server
 app.listen(port, () => {
-  console.log(`TRIBECORE server running on ${port}`);
+  console.log(`✅ TRIBECORE server running on port ${port}`);
 });
 
