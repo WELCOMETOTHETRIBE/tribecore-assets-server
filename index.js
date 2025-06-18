@@ -35,81 +35,36 @@ const quotes = {
 };
 
 const moods = {
-  wttt: ["🌿 Holistic", "🌀 Ancestral", "✨ Spiritual"],
-  jabroni: ["🔥 Smoky", "🍖 Mafia BBQ", "🧄 Bold"],
-  denly: ["🍝 Nostalgic", "🍷 Family", "🇮🇹 Italian-American"]
+  wttt: "🌀 Ancestral",
+  jabroni: "🔥 Intense",
+  denly: "🍕 Classic"
 };
 
-const brandMap = {
-  wttt: "WELCOME TO THE TRIBE",
-  jabroni: "Jabroni’s Wood Fired",
-  denly: "Denly Gardens"
-};
-
-// Root endpoint with usage instructions
-app.get('/', (req, res) => {
-  res.send(`
-    <h1>👋 Welcome to the TRIBECORE Assets Server</h1>
-    <p>Try one of the following endpoints:</p>
-    <ul>
-      <li><a href="/random?brand=wttt">/random?brand=wttt</a></li>
-      <li><a href="/quote?brand=jabroni">/quote?brand=jabroni</a></li>
-      <li><a href="/background?brand=denly">/background?brand=denly</a></li>
-      <li><a href="/notion-payload?brand=wttt">/notion-payload?brand=wttt</a></li>
-    </ul>
-  `);
-});
-
-// Serve a random image
-app.get('/random', (req, res) => {
-  const brand = req.query.brand?.toLowerCase() || 'wttt';
-  const selected = images[brand] || images['wttt'];
-  const image = selected[Math.floor(Math.random() * selected.length)];
-  res.json({ image });
-});
-
-// Serve a random quote
-app.get('/quote', (req, res) => {
-  const brand = req.query.brand?.toLowerCase() || 'wttt';
-  const selected = quotes[brand] || quotes['wttt'];
-  const quote = selected[Math.floor(Math.random() * selected.length)];
-  res.json({ quote });
-});
-
-// Serve a background bundle (image + quote)
-app.get('/background', (req, res) => {
-  const brand = req.query.brand?.toLowerCase() || 'wttt';
-  const selectedImages = images[brand] || images['wttt'];
-  const selectedQuotes = quotes[brand] || quotes['wttt'];
-
-  const image = selectedImages[Math.floor(Math.random() * selectedImages.length)];
-  const quote = selectedQuotes[Math.floor(Math.random() * selectedQuotes.length)];
-
-  res.json({ brand, image, quote });
-});
-
-// Serve a full Notion-ready creative content bundle
+// ✅ /notion-payload — for Notion integration
 app.get('/notion-payload', (req, res) => {
-  const brand = req.query.brand?.toLowerCase() || 'wttt';
-
+  const brand = req.query.brand || 'wttt';
   const selectedImages = images[brand] || images['wttt'];
   const selectedQuotes = quotes[brand] || quotes['wttt'];
-  const selectedMoods = moods[brand] || moods['wttt'];
+  const selectedMood = moods[brand] || "🌀 Vibe";
 
   const image = selectedImages[Math.floor(Math.random() * selectedImages.length)];
   const quote = selectedQuotes[Math.floor(Math.random() * selectedQuotes.length)];
-  const mood = selectedMoods[Math.floor(Math.random() * selectedMoods.length)];
+  const mood = selectedMood;
 
   res.json({
-    title: `Daily Creative — ${brandMap[brand] || 'Unknown Brand'}`,
+    title: `Daily Creative — ${brand.toUpperCase()}`,
     image,
     quote,
     mood
   });
 });
 
-// Start the server
+// Optional: homepage fallback
+app.get('/', (req, res) => {
+  res.send('🚀 TRIBECORE ASSETS API is live.');
+});
+
 app.listen(port, () => {
-  console.log(`✅ TRIBECORE server running on port ${port}`);
+  console.log(`TRIBECORE server running on ${port}`);
 });
 
